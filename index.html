@@ -3,891 +3,1043 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>週間献立カレンダー 6/8〜6/12</title>
+<title>週間献立カレンダー 6/15(月)〜6/19(金)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root {
-    --green: #2d7a4f;
-    --green-light: #e8f5ee;
-    --green-mid: #5aab78;
-    --orange: #e87a2d;
-    --orange-light: #fff3e8;
-    --yellow: #f5c842;
-    --red: #d94040;
-    --gray: #f5f5f5;
-    --gray2: #e0e0e0;
-    --text: #222;
-    --text-sub: #666;
-    --radius: 12px;
-    --shadow: 0 2px 12px rgba(0,0,0,.08);
-  }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
-    font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, sans-serif;
-    background: #f0f6f2;
-    color: var(--text);
+    font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: #fdf6ec;
+    color: #333;
     min-height: 100vh;
   }
-
-  /* ===== HEADER ===== */
-  .header {
-    background: linear-gradient(135deg, var(--green) 0%, #1a5c38 100%);
-    color: #fff;
-    padding: 20px 16px 16px;
+  header {
+    background: linear-gradient(135deg, #e8734a, #d4550c);
+    color: white;
+    padding: 20px;
     text-align: center;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
-  .header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: .05em; }
-  .header p { font-size: .8rem; opacity: .85; margin-top: 3px; }
+  header h1 { font-size: 1.4rem; font-weight: bold; }
+  header p { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; }
 
-  /* ===== TABS ===== */
   .tabs {
-    display: flex; background: #fff;
-    border-bottom: 2px solid var(--green-light);
-    overflow-x: auto; position: sticky; top: 74px; z-index: 99;
-    box-shadow: var(--shadow);
+    display: flex;
+    background: white;
+    border-bottom: 3px solid #e8734a;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 70px;
+    z-index: 99;
   }
-  .tab-btn {
-    flex: 1; min-width: 80px; padding: 12px 6px;
-    font-size: .8rem; font-weight: 600; color: var(--text-sub);
-    background: none; border: none; cursor: pointer;
-    border-bottom: 3px solid transparent; transition: all .2s;
+  .tab {
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
     white-space: nowrap;
+    color: #666;
+    transition: all 0.2s;
   }
-  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
-  .tab-btn:hover { background: var(--green-light); }
+  .tab.active {
+    border-bottom-color: #e8734a;
+    color: #e8734a;
+    font-weight: bold;
+  }
+  .tab:hover { background: #fff5f0; }
 
-  .tab-content { display: none; padding: 16px; }
-  .tab-content.active { display: block; }
+  .content { display: none; padding: 16px; max-width: 800px; margin: 0 auto; }
+  .content.active { display: block; }
 
-  /* ===== CALENDAR ===== */
-  .calendar-grid {
+  /* 献立カード */
+  .menu-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-  }
-  @media (max-width: 600px) {
-    .calendar-grid { grid-template-columns: 1fr; }
-  }
-
-  .day-card {
-    background: #fff; border-radius: var(--radius);
-    box-shadow: var(--shadow); overflow: hidden;
-    cursor: pointer; transition: transform .15s, box-shadow .15s;
-  }
-  .day-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.12); }
-
-  .day-header {
-    padding: 10px 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .day-circle {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: .9rem; color: #fff; flex-shrink: 0;
-  }
-  .day-circle.mon { background: #e04040; }
-  .day-circle.tue { background: #e07030; }
-  .day-circle.wed { background: #d4a020; }
-  .day-circle.thu { background: #3a9a5c; }
-  .day-circle.fri { background: #3060c8; }
-
-  .day-title { font-size: .85rem; }
-  .day-title .date { font-weight: 700; font-size: 1rem; }
-  .day-title .week { font-size: .75rem; color: var(--text-sub); }
-
-  .day-body { padding: 10px 12px 12px; }
-  .dish-name { font-weight: 700; font-size: .95rem; color: var(--green); margin-bottom: 6px; }
-  .dish-sub { font-size: .78rem; color: var(--text-sub); line-height: 1.5; }
-
-  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .tag {
-    font-size: .7rem; padding: 2px 8px; border-radius: 20px;
-    font-weight: 600;
-  }
-  .tag.time { background: #fff3e8; color: var(--orange); }
-  .tag.sale { background: #fee; color: var(--red); }
-  .tag.season { background: var(--green-light); color: var(--green); }
-
-  .cost-badge {
-    margin-top: 8px; text-align: right;
-    font-size: .8rem; color: var(--text-sub);
-  }
-  .cost-badge span { font-weight: 700; color: var(--green); font-size: .95rem; }
-
-  /* ===== RECIPE DETAIL ===== */
-  .recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: 16px;
   }
-
-  .recipe-card {
-    background: #fff; border-radius: var(--radius);
-    box-shadow: var(--shadow); overflow: hidden;
+  .day-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left: 5px solid var(--day-color);
   }
-  .recipe-card-header {
+  .day-header {
+    background: var(--day-color);
+    color: white;
     padding: 12px 16px;
-    display: flex; align-items: center; gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
-  .recipe-card-header .day-circle { width: 32px; height: 32px; font-size: .8rem; }
-  .recipe-card-header h3 { font-size: 1rem; font-weight: 700; }
-  .recipe-card-header .date-label { font-size: .78rem; color: var(--text-sub); }
+  .day-name { font-size: 1rem; font-weight: bold; }
+  .day-date { font-size: 0.75rem; opacity: 0.9; }
+  .sale-badge {
+    background: rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+  }
+  .day-body { padding: 14px 16px; }
+  .menu-title { font-size: 1.05rem; font-weight: bold; color: #333; margin-bottom: 6px; }
+  .menu-items { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .menu-tag {
+    background: #fff5f0;
+    color: #e8734a;
+    border: 1px solid #ffd0b8;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+  }
+  .menu-tag.fish { background: #f0f8ff; color: #2980b9; border-color: #b8d4f5; }
+  .menu-tag.veg { background: #f0fff4; color: #27ae60; border-color: #b8f0c8; }
 
-  .recipe-section { padding: 0 16px 16px; }
+  .detail-btn {
+    background: #e8734a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .detail-btn:hover { background: #d4550c; }
+
+  /* レシピ詳細 */
+  .recipe-panel {
+    display: none;
+    background: #fdf9f6;
+    border-top: 1px solid #f0e8e0;
+    padding: 14px 16px;
+  }
+  .recipe-panel.open { display: block; }
+  .recipe-section { margin-bottom: 12px; }
   .recipe-section h4 {
-    font-size: .8rem; font-weight: 700; color: var(--green);
-    border-left: 3px solid var(--green); padding-left: 8px;
-    margin: 12px 0 8px;
+    font-size: 0.82rem;
+    color: #e8734a;
+    border-left: 3px solid #e8734a;
+    padding-left: 6px;
+    margin-bottom: 6px;
   }
+  .ingredients { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .ingredient {
+    font-size: 0.78rem;
+    padding: 3px 0;
+    border-bottom: 1px dotted #e8e0d8;
+    display: flex;
+    justify-content: space-between;
+  }
+  .ingredient .name { color: #555; }
+  .ingredient .amount { color: #888; }
+  .steps { list-style: none; }
+  .steps li {
+    font-size: 0.8rem;
+    padding: 5px 0 5px 24px;
+    position: relative;
+    border-bottom: 1px dotted #e8e0d8;
+    line-height: 1.5;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: attr(data-n);
+    position: absolute;
+    left: 0;
+    background: #e8734a;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 6px;
+  }
+  .tips {
+    background: #fffde7;
+    border: 1px solid #fce57a;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    color: #7a6a00;
+  }
+  .tips::before { content: '💡 '; }
 
-  .ingredients-list { list-style: none; }
-  .ingredients-list li {
-    display: flex; justify-content: space-between;
-    padding: 4px 0; font-size: .83rem;
-    border-bottom: 1px dashed var(--gray2);
-  }
-  .ingredients-list li:last-child { border-bottom: none; }
-  .ingr-name { color: var(--text); }
-  .ingr-amount { color: var(--text-sub); font-size: .78rem; }
-  .ingr-sale { color: var(--red); font-size: .72rem; font-weight: 600; margin-left: 4px; }
-
-  .steps-list { list-style: none; }
-  .steps-list li {
-    display: flex; gap: 10px;
-    padding: 6px 0; font-size: .83rem; line-height: 1.5;
-    border-bottom: 1px solid var(--gray2);
-  }
-  .steps-list li:last-child { border-bottom: none; }
-  .step-num {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: var(--green); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
-  }
-
-  .tip-box {
-    background: var(--orange-light);
-    border-radius: 8px; padding: 8px 12px;
-    font-size: .78rem; color: var(--orange);
-    margin-top: 10px;
-  }
-  .tip-box::before { content: "💡 "; }
-
-  /* ===== SHOPPING LIST ===== */
+  /* 買い物リスト */
   .shopping-section { margin-bottom: 20px; }
-  .shopping-section h3 {
-    font-size: 1rem; font-weight: 700; color: #fff;
-    background: var(--green); padding: 10px 16px;
-    border-radius: var(--radius) var(--radius) 0 0;
+  .shopping-header {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0 0;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .shopping-section h3.thu { background: #3060c8; }
-
-  .shop-category { background: #fff; padding: 0 0 4px; }
-  .shop-cat-label {
-    font-size: .78rem; font-weight: 700; color: var(--text-sub);
-    padding: 8px 16px 4px; text-transform: uppercase; letter-spacing: .05em;
-    border-bottom: 1px solid var(--gray2);
+  .shopping-body {
+    background: white;
+    border: 1px solid #d5e8d4;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+  }
+  .shop-category {
+    padding: 8px 16px;
+    background: #f0faf0;
+    font-size: 0.78rem;
+    font-weight: bold;
+    color: #27ae60;
+    border-top: 1px solid #d5e8d4;
   }
   .shop-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 16px; border-bottom: 1px solid var(--gray); font-size: .85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    border-top: 1px dotted #e8f0e8;
   }
-  .shop-item:last-child { border-bottom: none; }
-  .shop-check {
-    width: 18px; height: 18px; border-radius: 4px;
-    border: 2px solid var(--green); cursor: pointer; flex-shrink: 0;
-    transition: all .15s; background: #fff; appearance: none;
-    -webkit-appearance: none;
-  }
-  .shop-check:checked {
-    background: var(--green);
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5l3 4 7-8' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-size: 70%; background-repeat: no-repeat; background-position: center;
-  }
-  label:has(.shop-check:checked) .shop-item-name { text-decoration: line-through; color: var(--text-sub); }
-  label { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--gray); cursor: pointer; }
-  label:last-child { border-bottom: none; }
+  .shop-item input[type="checkbox"] { margin-right: 8px; accent-color: #27ae60; }
+  .shop-item label { flex: 1; cursor: pointer; }
+  .shop-item .price { color: #e8734a; font-weight: bold; white-space: nowrap; }
+  .shop-item .note { font-size: 0.7rem; color: #888; }
 
-  .shop-item-name { flex: 1; font-size: .85rem; }
-  .shop-item-amount { font-size: .78rem; color: var(--text-sub); margin-right: 8px; }
-  .shop-item-price { font-size: .78rem; font-weight: 700; color: var(--green); min-width: 50px; text-align: right; }
-  .shop-item-price.sale { color: var(--red); }
+  .total-row {
+    background: #e8f5e9;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-top: 2px solid #27ae60;
+  }
+  .total-row .amount { color: #27ae60; }
 
   .share-buttons {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    padding: 12px 0; margin-top: 4px;
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
   }
   .share-btn {
-    flex: 1; min-width: 100px; padding: 10px 12px;
-    border-radius: 8px; border: none; cursor: pointer;
-    font-size: .85rem; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: opacity .2s;
+    flex: 1;
+    min-width: 100px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
-  .share-btn:hover { opacity: .85; }
-  .btn-copy { background: var(--gray); color: var(--text); }
-  .btn-line { background: #06C755; color: #fff; }
-  .btn-qr { background: var(--green); color: #fff; }
+  .btn-copy { background: #3498db; color: white; }
+  .btn-line { background: #00b900; color: white; }
+  .btn-qr { background: #8e44ad; color: white; }
+  .btn-copy:hover { background: #2980b9; }
+  .btn-line:hover { background: #009900; }
+  .btn-qr:hover { background: #7d3c98; }
 
-  .qr-modal {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.5); z-index: 200;
-    align-items: center; justify-content: center;
+  #qr-container {
+    display: none;
+    text-align: center;
+    padding: 16px;
+    background: white;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
-  .qr-modal.open { display: flex; }
-  .qr-box {
-    background: #fff; border-radius: 16px; padding: 24px;
-    text-align: center; max-width: 280px; width: 90%;
-  }
-  .qr-box h3 { font-size: 1rem; margin-bottom: 16px; color: var(--green); }
-  .qr-box p { font-size: .78rem; color: var(--text-sub); margin-top: 12px; }
-  .qr-close {
-    margin-top: 16px; padding: 8px 24px;
-    background: var(--gray2); border: none; border-radius: 8px;
-    cursor: pointer; font-size: .85rem; font-weight: 600;
-  }
-  #qrcode { display: flex; justify-content: center; }
-  #qrcode canvas, #qrcode img { border-radius: 8px; }
+  #qr-container.show { display: block; }
+  #qr-container p { font-size: 0.78rem; color: #666; margin-top: 8px; }
 
-  .copy-toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--text); color: #fff; padding: 8px 20px;
-    border-radius: 20px; font-size: .85rem; opacity: 0;
-    transition: opacity .3s; z-index: 300; pointer-events: none;
+  .copy-success {
+    display: none;
+    background: #27ae60;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.82rem;
+    margin-top: 8px;
   }
-  .copy-toast.show { opacity: 1; }
+  .copy-success.show { display: block; }
 
-  /* ===== BUDGET ===== */
-  .budget-total {
-    background: linear-gradient(135deg, var(--green) 0%, #1a5c38 100%);
-    border-radius: var(--radius); padding: 20px; color: #fff;
-    text-align: center; margin-bottom: 16px;
+  /* 予算 */
+  .budget-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-  .budget-total h3 { font-size: .9rem; opacity: .85; }
-  .budget-total .amount { font-size: 2.2rem; font-weight: 700; margin: 4px 0; }
-  .budget-total p { font-size: .8rem; opacity: .75; }
-  .budget-bar-wrap { background: rgba(255,255,255,.3); border-radius: 4px; height: 8px; margin-top: 10px; }
-  .budget-bar { background: var(--yellow); height: 8px; border-radius: 4px; transition: width 1s; }
-
-  .budget-table { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .budget-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+  .budget-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+  }
+  .budget-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(to right, #27ae60, #e8734a);
+  }
   .budget-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 16px; border-bottom: 1px solid var(--gray);
-    font-size: .85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px dotted #eee;
   }
   .budget-row:last-child { border-bottom: none; }
-  .budget-row.subtotal { background: var(--green-light); font-weight: 700; color: var(--green); }
-  .budget-row.total { background: var(--green); color: #fff; font-weight: 700; font-size: .95rem; }
-  .budget-row .item-label { flex: 1; }
-  .budget-row .item-note { font-size: .75rem; color: var(--text-sub); }
-  .budget-row.total .item-note { color: rgba(255,255,255,.7); }
-  .budget-row .item-price { font-weight: 700; text-align: right; min-width: 70px; }
-
-  .budget-advice {
-    background: var(--orange-light);
-    border-radius: var(--radius); padding: 14px 16px;
-    margin-top: 12px; font-size: .82rem; color: var(--orange); line-height: 1.7;
+  .budget-row .cat { color: #666; }
+  .budget-row .amt { font-weight: bold; color: #e8734a; }
+  .budget-total {
+    background: #fff5f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-weight: bold;
   }
-  .budget-advice h4 { font-size: .9rem; font-weight: 700; margin-bottom: 6px; }
+  .budget-total .remain { color: #27ae60; }
 
-  /* ===== MISC ===== */
-  .section-title {
-    font-size: 1rem; font-weight: 700; color: var(--green);
-    margin-bottom: 12px; padding-bottom: 6px;
-    border-bottom: 2px solid var(--green-light);
-    display: flex; align-items: center; gap: 8px;
+  .nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
   }
+  .nutrition-item {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .nutrition-item .label { font-size: 0.7rem; color: #888; }
+  .nutrition-item .value { font-size: 1rem; font-weight: bold; color: #e8734a; }
+  .nutrition-item .unit { font-size: 0.65rem; color: #aaa; }
 
-  .notice-box {
-    background: #fff8e1; border-radius: 8px; padding: 10px 14px;
-    font-size: .8rem; color: #8a6d00; margin-bottom: 14px;
-    border-left: 3px solid var(--yellow);
+  .week-summary {
+    background: linear-gradient(135deg, #e8734a, #c0392b);
+    color: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .week-summary h3 { font-size: 0.9rem; margin-bottom: 10px; opacity: 0.9; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .summary-item { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; }
+  .summary-item .s-label { font-size: 0.7rem; opacity: 0.8; }
+  .summary-item .s-value { font-size: 1.1rem; font-weight: bold; }
+
+  /* 食材使いきり表 */
+  .ingredient-map {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  .ingredient-map h3 { font-size: 0.9rem; margin-bottom: 12px; color: #555; }
+  .ing-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dotted #eee;
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  .ing-name { width: 90px; color: #333; font-weight: 500; }
+  .ing-days { display: flex; gap: 4px; flex-wrap: wrap; }
+  .ing-day-tag {
+    background: #e8734a;
+    color: white;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 0.7rem;
+  }
+  .ing-day-tag.day2 { background: #e67e22; }
+  .ing-day-tag.day3 { background: #27ae60; }
+  .ing-day-tag.day4 { background: #2980b9; }
+  .ing-day-tag.day5 { background: #8e44ad; }
+
+  @media (max-width: 480px) {
+    .ingredients { grid-template-columns: 1fr; }
+    .nutrition-grid { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🍚 週間献立カレンダー</h1>
-  <p>6月8日（月）〜 6月12日（金） ／ 4人家族 ／ 予算5,000円</p>
-</div>
+<header>
+  <h1>🍽️ 週間夕食献立カレンダー</h1>
+  <p>2026年6月15日(月)〜19日(金)｜4人家族｜予算5,000円</p>
+</header>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('calendar', this)">📅 献立</button>
-  <button class="tab-btn" onclick="switchTab('recipe', this)">📖 レシピ</button>
-  <button class="tab-btn" onclick="switchTab('shopping', this)">🛒 買い物</button>
-  <button class="tab-btn" onclick="switchTab('budget', this)">💰 予算</button>
+  <div class="tab active" onclick="showTab('calendar')">📅 献立カレンダー</div>
+  <div class="tab" onclick="showTab('shopping')">🛒 買い物リスト</div>
+  <div class="tab" onclick="showTab('budget')">💰 予算・栄養</div>
 </div>
 
-<!-- ==================== 献立カレンダー ==================== -->
-<div id="tab-calendar" class="tab-content active">
-  <div class="calendar-grid">
+<!-- ===== 献立カレンダー ===== -->
+<div id="tab-calendar" class="content active">
+  <div class="menu-grid">
 
-    <!-- 月曜 -->
-    <div class="day-card" onclick="switchTab('recipe', document.querySelector('.tab-btn:nth-child(2)'))">
+    <!-- 月曜日 -->
+    <div class="day-card" style="--day-color: #e8734a">
       <div class="day-header">
-        <div class="day-circle mon">月</div>
-        <div class="day-title">
-          <div class="date">6/8</div>
-          <div class="week">月曜日</div>
+        <div>
+          <div class="day-name">月曜日 6/15</div>
+          <div class="day-date">ヨークベニマル お肉の市</div>
         </div>
+        <span class="sale-badge">🥩 豚肉3割引</span>
       </div>
       <div class="day-body">
-        <div class="dish-name">🍱 ロースとんかつ定食</div>
-        <div class="dish-sub">
-          チンゲン菜のオイスター炒め<br>
-          めかぶとろろ ／ ご飯・味噌汁
+        <div class="menu-title">豚のしょうが焼き定食</div>
+        <div class="menu-items">
+          <span class="menu-tag">🥩 豚うす切りしょうが焼き</span>
+          <span class="menu-tag veg">🥒 きゅうりと玉ねぎのサラダ</span>
+          <span class="menu-tag veg">🥣 新じゃが＆わかめの味噌汁</span>
         </div>
-        <div class="tags">
-          <span class="tag time">⏱ 25分</span>
-          <span class="tag sale">🏷 99円均一</span>
+        <button class="detail-btn" onclick="toggleRecipe('r1')">▼ レシピを見る</button>
+      </div>
+      <div class="recipe-panel" id="r1">
+        <div class="recipe-section">
+          <h4>🛒 材料（4人分）</h4>
+          <div class="ingredients">
+            <div class="ingredient"><span class="name">豚うす切り肉</span><span class="amount">350g</span></div>
+            <div class="ingredient"><span class="name">しょうが</span><span class="amount">1かけ</span></div>
+            <div class="ingredient"><span class="name">醤油</span><span class="amount">大さじ3</span></div>
+            <div class="ingredient"><span class="name">みりん</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">酒</span><span class="amount">大さじ1</span></div>
+            <div class="ingredient"><span class="name">きゅうり</span><span class="amount">2本</span></div>
+            <div class="ingredient"><span class="name">新玉ねぎ</span><span class="amount">1/2個</span></div>
+            <div class="ingredient"><span class="name">新じゃが芋</span><span class="amount">3個</span></div>
+            <div class="ingredient"><span class="name">わかめ（乾燥）</span><span class="amount">5g</span></div>
+            <div class="ingredient"><span class="name">味噌</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">だし汁</span><span class="amount">600ml</span></div>
+            <div class="ingredient"><span class="name">サラダ油</span><span class="amount">大さじ1</span></div>
+          </div>
         </div>
-        <div class="cost-badge">食材費 <span>約650円</span></div>
+        <div class="recipe-section">
+          <h4>👨‍🍳 作り方</h4>
+          <ol class="steps">
+            <li data-n="1">醤油・みりん・酒・すりおろしたしょうかを混ぜてタレを作る。豚肉を漬けて10分おく。</li>
+            <li data-n="2">きゅうりは薄切りにして塩でもみ、水けを絞る。新玉ねぎは薄切りにして水にさらす。ポン酢で和える。</li>
+            <li data-n="3">新じゃがはよく洗い、半分に切る。わかめは水で戻す。だし汁でじゃがいもを柔らかくなるまで煮て、わかめを加え味噌を溶く。</li>
+            <li data-n="4">フライパンに油を熱し、豚肉を広げて中火で焼く。両面に焼き色がついたらタレを加えて絡め照りを出す。</li>
+          </ol>
+        </div>
+        <div class="tips">豚肉は重ならないよう広げて焼くのが美味しく仕上げるコツ。タレは最後に加えると焦げにくい。</div>
       </div>
     </div>
 
-    <!-- 火曜 -->
-    <div class="day-card" onclick="switchTab('recipe', document.querySelector('.tab-btn:nth-child(2)'))">
+    <!-- 火曜日 -->
+    <div class="day-card" style="--day-color: #27ae60">
       <div class="day-header">
-        <div class="day-circle tue">火</div>
-        <div class="day-title">
-          <div class="date">6/9</div>
-          <div class="week">火曜日</div>
+        <div>
+          <div class="day-name">火曜日 6/16</div>
+          <div class="day-date">ヨークベニマル お野菜の市</div>
         </div>
+        <span class="sale-badge">🌽 野菜特売日</span>
       </div>
       <div class="day-body">
-        <div class="dish-name">🥔 豚肉と新じゃがの煮物</div>
-        <div class="dish-sub">
-          キャベツの浅漬け<br>
-          ご飯・玉ねぎ味噌汁
+        <div class="menu-title">鶏ももとトウモロコシのバター醤油炒め</div>
+        <div class="menu-items">
+          <span class="menu-tag">🍗 鶏もものバター醤油炒め</span>
+          <span class="menu-tag veg">🍆 なすの揚げびたし</span>
+          <span class="menu-tag veg">🥣 にらと豆腐の味噌汁</span>
         </div>
-        <div class="tags">
-          <span class="tag time">⏱ 30分</span>
-          <span class="tag sale">🏷 お肉3割引</span>
-          <span class="tag season">🌿 旬の新じゃが</span>
+        <button class="detail-btn" onclick="toggleRecipe('r2')">▼ レシピを見る</button>
+      </div>
+      <div class="recipe-panel" id="r2">
+        <div class="recipe-section">
+          <h4>🛒 材料（4人分）</h4>
+          <div class="ingredients">
+            <div class="ingredient"><span class="name">鶏もも肉</span><span class="amount">350g</span></div>
+            <div class="ingredient"><span class="name">とうもろこし</span><span class="amount">2本</span></div>
+            <div class="ingredient"><span class="name">バター</span><span class="amount">20g</span></div>
+            <div class="ingredient"><span class="name">醤油</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">酒</span><span class="amount">大さじ1</span></div>
+            <div class="ingredient"><span class="name">長なす</span><span class="amount">3本</span></div>
+            <div class="ingredient"><span class="name">めんつゆ（2倍濃縮）</span><span class="amount">大さじ3</span></div>
+            <div class="ingredient"><span class="name">水</span><span class="amount">200ml</span></div>
+            <div class="ingredient"><span class="name">にら</span><span class="amount">1束</span></div>
+            <div class="ingredient"><span class="name">豆腐</span><span class="amount">1/2丁</span></div>
+            <div class="ingredient"><span class="name">味噌</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">揚げ油</span><span class="amount">適量</span></div>
+          </div>
         </div>
-        <div class="cost-badge">食材費 <span>約870円</span></div>
+        <div class="recipe-section">
+          <h4>👨‍🍳 作り方</h4>
+          <ol class="steps">
+            <li data-n="1">とうもろこしは電子レンジで1本3分（ラップなし）加熱し、粗熱が取れたら包丁で実をそぎ落とす。</li>
+            <li data-n="2">なすは乱切りにして、170℃の油で2分素揚げし、油を切る。めんつゆを水で希釈したものに浸す。冷めると味がしみる。</li>
+            <li data-n="3">鶏もも肉は一口大に切り、酒をふる。フライパンを中火にかけ皮目から焼き、こんがりしたら裏返す。とうもろこしを加えてバターを加え、醤油で味付け。</li>
+            <li data-n="4">だし汁に豆腐を加えて温め、にらを2cm長に切って加える。味噌を溶いて完成。</li>
+          </ol>
+        </div>
+        <div class="tips">とうもろこしのレンジ加熱はラップなしがポイント！蒸気が逃げてシャキッとした食感になります。</div>
       </div>
     </div>
 
-    <!-- 水曜 -->
-    <div class="day-card" onclick="switchTab('recipe', document.querySelector('.tab-btn:nth-child(2)'))">
+    <!-- 水曜日 -->
+    <div class="day-card" style="--day-color: #2980b9">
       <div class="day-header">
-        <div class="day-circle wed">水</div>
-        <div class="day-title">
-          <div class="date">6/10</div>
-          <div class="week">水曜日</div>
+        <div>
+          <div class="day-name">水曜日 6/17</div>
+          <div class="day-date">ヨークベニマル お魚の市</div>
         </div>
+        <span class="sale-badge">🐟 魚特売日</span>
       </div>
       <div class="day-body">
-        <div class="dish-name">🍜 ウインナー焼きそば</div>
-        <div class="dish-sub">
-          かつおぶしめじのおひたし<br>
-          フルーツヨーグルト
+        <div class="menu-title">真あじの南蛮漬け定食</div>
+        <div class="menu-items">
+          <span class="menu-tag fish">🐟 真あじの南蛮漬け</span>
+          <span class="menu-tag veg">🥗 ほうれん草のごま和え</span>
+          <span class="menu-tag veg">🥣 もずく＆新玉ねぎのスープ</span>
         </div>
-        <div class="tags">
-          <span class="tag time">⏱ 20分</span>
-          <span class="tag sale">🏷 99円均一</span>
+        <button class="detail-btn" onclick="toggleRecipe('r3')">▼ レシピを見る</button>
+      </div>
+      <div class="recipe-panel" id="r3">
+        <div class="recipe-section">
+          <h4>🛒 材料（4人分）</h4>
+          <div class="ingredients">
+            <div class="ingredient"><span class="name">生真あじ</span><span class="amount">2尾</span></div>
+            <div class="ingredient"><span class="name">片栗粉</span><span class="amount">大さじ3</span></div>
+            <div class="ingredient"><span class="name">新玉ねぎ</span><span class="amount">1/2個</span></div>
+            <div class="ingredient"><span class="name">にんじん</span><span class="amount">1/3本</span></div>
+            <div class="ingredient"><span class="name">酢</span><span class="amount">大さじ4</span></div>
+            <div class="ingredient"><span class="name">砂糖</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">醤油</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">赤唐辛子（輪切り）</span><span class="amount">少々</span></div>
+            <div class="ingredient"><span class="name">ほうれん草</span><span class="amount">1束</span></div>
+            <div class="ingredient"><span class="name">すりごま</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">味もずく</span><span class="amount">3パック</span></div>
+            <div class="ingredient"><span class="name">揚げ油</span><span class="amount">適量</span></div>
+          </div>
         </div>
-        <div class="cost-badge">食材費 <span>約550円</span></div>
+        <div class="recipe-section">
+          <h4>👨‍🍳 作り方</h4>
+          <ol class="steps">
+            <li data-n="1">あじは3枚おろしにする（お店でお願いしてもOK）。塩こしょうし、片栗粉をまぶす。</li>
+            <li data-n="2">南蛮ダレを作る：酢・砂糖・醤油・水50mlを合わせ電子レンジで1分加熱。薄切りにした玉ねぎ・にんじん・赤唐辛子を加える。</li>
+            <li data-n="3">あじを170℃の油で3〜4分揚げる。アツアツのうちに南蛮ダレに漬ける。30分以上おくと味がしみる。</li>
+            <li data-n="4">ほうれん草は塩茹でして冷水でさます。水けを絞り3cm幅に切り、醤油小さじ1とすりごまで和える。</li>
+            <li data-n="5">もずくは袋から出してお椀に盛り、熱いだし汁を注ぐだけ（味付き）。</li>
+          </ol>
+        </div>
+        <div class="tips">南蛮漬けは前日に作っておくと翌日も美味しく食べられます！ほうれん草は少し多めに茹でて翌日の副菜にも使いまわしできます。</div>
       </div>
     </div>
 
-    <!-- 木曜 -->
-    <div class="day-card" onclick="switchTab('recipe', document.querySelector('.tab-btn:nth-child(2)'))">
+    <!-- 木曜日 -->
+    <div class="day-card" style="--day-color: #8e44ad">
       <div class="day-header">
-        <div class="day-circle thu">木</div>
-        <div class="day-title">
-          <div class="date">6/11</div>
-          <div class="week">木曜日</div>
+        <div>
+          <div class="day-name">木曜日 6/18</div>
+          <div class="day-date">ヨークベニマル 日配品の市</div>
         </div>
+        <span class="sale-badge">🍳 挽肉2割引</span>
       </div>
       <div class="day-body">
-        <div class="dish-name">🐟 ぶりの照り焼き</div>
-        <div class="dish-sub">
-          新玉ねぎのポン酢サラダ<br>
-          ご飯・豆腐の味噌汁
+        <div class="menu-title">和風おろしハンバーグ</div>
+        <div class="menu-items">
+          <span class="menu-tag">🍔 和風おろしハンバーグ</span>
+          <span class="menu-tag veg">🌽 コーンと枝豆のバターソテー</span>
+          <span class="menu-tag veg">🥣 新じゃが芋の豆腐汁</span>
         </div>
-        <div class="tags">
-          <span class="tag time">⏱ 25分</span>
-          <span class="tag season">🌿 旬のぶり</span>
+        <button class="detail-btn" onclick="toggleRecipe('r4')">▼ レシピを見る</button>
+      </div>
+      <div class="recipe-panel" id="r4">
+        <div class="recipe-section">
+          <h4>🛒 材料（4人分）</h4>
+          <div class="ingredients">
+            <div class="ingredient"><span class="name">合いびき肉</span><span class="amount">400g</span></div>
+            <div class="ingredient"><span class="name">玉ねぎ</span><span class="amount">1/2個</span></div>
+            <div class="ingredient"><span class="name">卵</span><span class="amount">1個</span></div>
+            <div class="ingredient"><span class="name">パン粉</span><span class="amount">大さじ4</span></div>
+            <div class="ingredient"><span class="name">牛乳</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">塩こしょう</span><span class="amount">少々</span></div>
+            <div class="ingredient"><span class="name">大根</span><span class="amount">5cm</span></div>
+            <div class="ingredient"><span class="name">ポン酢醤油</span><span class="amount">大さじ4</span></div>
+            <div class="ingredient"><span class="name">みりん</span><span class="amount">大さじ1</span></div>
+            <div class="ingredient"><span class="name">新じゃが芋</span><span class="amount">3個</span></div>
+            <div class="ingredient"><span class="name">豆腐</span><span class="amount">1/2丁</span></div>
+            <div class="ingredient"><span class="name">味噌</span><span class="amount">大さじ2</span></div>
+          </div>
         </div>
-        <div class="cost-badge">食材費 <span>約700円</span></div>
+        <div class="recipe-section">
+          <h4>👨‍🍳 作り方</h4>
+          <ol class="steps">
+            <li data-n="1">玉ねぎをみじん切りにしてレンジ2分加熱し冷ます。ひき肉・卵・パン粉・牛乳・塩こしょうとともによくこねる。</li>
+            <li data-n="2">4等分にして楕円形に整え、中央をへこませる。フライパンで中火2分焼き、裏返してフタをして弱火7分蒸し焼き。</li>
+            <li data-n="3">ハンバーグを取り出す。同じフライパンにポン酢・みりんを加えてひと煮立ちさせ、大根おろしを加えてソース完成。</li>
+            <li data-n="4">新じゃがは小さく切ってレンジ3分加熱。だし汁に加えて豆腐と味噌を溶いて汁物を作る。</li>
+          </ol>
+        </div>
+        <div class="tips">ハンバーグの中央をへこませると均一に火が通ります。大根おろしソースでさっぱりと、子どもも食べやすい和風仕立て。</div>
       </div>
     </div>
 
-    <!-- 金曜 -->
-    <div class="day-card" onclick="switchTab('recipe', document.querySelector('.tab-btn:nth-child(2)'))">
+    <!-- 金曜日 -->
+    <div class="day-card" style="--day-color: #c0392b">
       <div class="day-header">
-        <div class="day-circle fri">金</div>
-        <div class="day-title">
-          <div class="date">6/12</div>
-          <div class="week">金曜日</div>
+        <div>
+          <div class="day-name">金曜日 6/19</div>
+          <div class="day-date">食材使いきりデー</div>
         </div>
+        <span class="sale-badge">♻️ 使いきり</span>
       </div>
       <div class="day-body">
-        <div class="dish-name">🥩 豚ロースの生姜焼き</div>
-        <div class="dish-sub">
-          にんじんしりしり<br>
-          キャベツの千切り ／ ご飯・味噌汁
+        <div class="menu-title">塩鮭と夏野菜のホイル焼き</div>
+        <div class="menu-items">
+          <span class="menu-tag fish">🐟 塩鮭と野菜のホイル焼き</span>
+          <span class="menu-tag veg">🥗 ほうれん草の白和え</span>
+          <span class="menu-tag veg">🥣 きゅうりと玉ねぎの冷やし汁</span>
         </div>
-        <div class="tags">
-          <span class="tag time">⏱ 20分</span>
-          <span class="tag sale">🏷 お肉3割引</span>
+        <button class="detail-btn" onclick="toggleRecipe('r5')">▼ レシピを見る</button>
+      </div>
+      <div class="recipe-panel" id="r5">
+        <div class="recipe-section">
+          <h4>🛒 材料（4人分）</h4>
+          <div class="ingredients">
+            <div class="ingredient"><span class="name">冷凍塩鮭（切り身）</span><span class="amount">4切れ</span></div>
+            <div class="ingredient"><span class="name">長なす（残り）</span><span class="amount">2本</span></div>
+            <div class="ingredient"><span class="name">新玉ねぎ（残り）</span><span class="amount">1/2個</span></div>
+            <div class="ingredient"><span class="name">バター</span><span class="amount">20g</span></div>
+            <div class="ingredient"><span class="name">酒</span><span class="amount">大さじ2</span></div>
+            <div class="ingredient"><span class="name">ほうれん草（残り）</span><span class="amount">1/2束</span></div>
+            <div class="ingredient"><span class="name">木綿豆腐</span><span class="amount">1/2丁</span></div>
+            <div class="ingredient"><span class="name">白みそ</span><span class="amount">大さじ1</span></div>
+            <div class="ingredient"><span class="name">砂糖</span><span class="amount">小さじ1</span></div>
+            <div class="ingredient"><span class="name">きゅうり（残り）</span><span class="amount">1本</span></div>
+            <div class="ingredient"><span class="name">冷水</span><span class="amount">600ml</span></div>
+            <div class="ingredient"><span class="name">顆粒だし</span><span class="amount">小さじ1</span></div>
+          </div>
         </div>
-        <div class="cost-badge">食材費 <span>約590円</span></div>
+        <div class="recipe-section">
+          <h4>👨‍🍳 作り方</h4>
+          <ol class="steps">
+            <li data-n="1">鮭は解凍しておく（前日冷蔵庫へ）。なすは輪切り、玉ねぎは薄切りにする。</li>
+            <li data-n="2">アルミホイルに野菜→鮭の順に乗せ、酒とバターを加えてしっかり包む。オーブントースターで15分焼く。</li>
+            <li data-n="3">豆腐はキッチンペーパーで包んでレンジ1分加熱し水切り。すりつぶして白みそ・砂糖を混ぜる。塩茹でして冷やしたほうれん草を和える。</li>
+            <li data-n="4">冷水に顆粒だしを溶かし、薄切りにしたきゅうりと玉ねぎを入れる。ポン酢を少々加えて冷やし汁完成。</li>
+          </ol>
+        </div>
+        <div class="tips">ホイル焼きはオーブントースターにお任せなので、その間に副菜を準備できます。週の残り野菜をまとめて使い切れる便利メニュー！</div>
       </div>
     </div>
 
+  </div><!-- /menu-grid -->
+</div><!-- /tab-calendar -->
+
+<!-- ===== 買い物リスト ===== -->
+<div id="tab-shopping" class="content">
+
+  <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px 14px;font-size:0.78rem;color:#7a6a00;margin-bottom:12px">
+    ⚠️ ヨークベニマルのセールは<strong>日替り（各日限り）</strong>のため、特売価格で買うには対象日に買い物が必要です。今週は3回に分けると全てのセール品を活用できます。
   </div>
 
-  <div style="margin-top:16px; padding:14px; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); font-size:.82rem; color:var(--text-sub); line-height:1.7;">
-    <strong style="color:var(--green);">🛒 買い物のポイント</strong><br>
-    ・<strong>1回目（6/9 火曜）</strong> ─ やさいの日＋お肉の日に合わせて月〜水曜分を購入。<br>
-    ・<strong>2回目（6/11 木曜）</strong> ─ 豚ロースを購入（量り売り鮮魚コーナーも確認）。<br>
-    ・ぶりは6/9に購入して冷蔵保存（翌々日までに使用）するとさらにお得！
-  </div>
-</div>
-
-<!-- ==================== レシピ ==================== -->
-<div id="tab-recipe" class="tab-content">
-  <div class="recipe-grid">
-
-    <!-- 月曜 -->
-    <div class="recipe-card">
-      <div class="recipe-card-header" style="background:#fff5f5;">
-        <div class="day-circle mon" style="width:32px;height:32px;font-size:.8rem;">月</div>
-        <div>
-          <h3>ロースとんかつ定食</h3>
-          <div class="date-label">6/8（月） ・ 約25分</div>
-        </div>
-      </div>
-      <div class="recipe-section">
-        <h4>🥩 材料（4人分）</h4>
-        <ul class="ingredients-list">
-          <li><span class="ingr-name">ロースとんかつ <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1パック（4枚）</span></li>
-          <li><span class="ingr-name">チンゲン菜 <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1袋（2株）</span></li>
-          <li><span class="ingr-name">めかぶ <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1袋（4パック）</span></li>
-          <li><span class="ingr-name">キャベツ（千切り・付合せ）</span><span class="ingr-amount">1/8玉</span></li>
-          <li><span class="ingr-name">ごま油</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">にんにく（チューブ可）</span><span class="ingr-amount">小さじ1/2</span></li>
-          <li><span class="ingr-name">オイスターソース</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">しょうゆ</span><span class="ingr-amount">小さじ1</span></li>
-          <li><span class="ingr-name">中濃ソース（とんかつ用）</span><span class="ingr-amount">適量</span></li>
-        </ul>
-        <h4>📋 手順</h4>
-        <ol class="steps-list">
-          <li><span class="step-num">1</span><span>キャベツを細く千切りにして水にさらし、水気を切る（5分）</span></li>
-          <li><span class="step-num">2</span><span>チンゲン菜を洗い、葉と茎に分けて4cm幅に切る（3分）</span></li>
-          <li><span class="step-num">3</span><span>フライパンにごま油・にんにくを入れ中火で熱し、チンゲン菜の茎から炒める（3分）</span></li>
-          <li><span class="step-num">4</span><span>葉を加えてさっと炒め、オイスターソース・しょうゆで味付けする（2分）</span></li>
-          <li><span class="step-num">5</span><span>とんかつをオーブントースターに並べてアルミホイルをかぶせ、8〜10分温める（10分）</span></li>
-          <li><span class="step-num">6</span><span>器に盛り付け、めかぶを添える</span></li>
-        </ol>
-        <div class="tip-box">揚げ済みとんかつはホイルをかぶせると外はサクサク、中はしっとりに仕上がります！</div>
-      </div>
-    </div>
-
-    <!-- 火曜 -->
-    <div class="recipe-card">
-      <div class="recipe-card-header" style="background:#fff9f5;">
-        <div class="day-circle tue" style="width:32px;height:32px;font-size:.8rem;">火</div>
-        <div>
-          <h3>豚肉と新じゃがの煮物</h3>
-          <div class="date-label">6/9（火） ・ 約30分</div>
-        </div>
-      </div>
-      <div class="recipe-section">
-        <h4>🥩 材料（4人分）</h4>
-        <ul class="ingredients-list">
-          <li><span class="ingr-name">豚もも肉 <span class="ingr-sale">3割引</span></span><span class="ingr-amount">300g</span></li>
-          <li><span class="ingr-name">新じゃがいも <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">400g（小8〜10個）</span></li>
-          <li><span class="ingr-name">にんじん <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1本</span></li>
-          <li><span class="ingr-name">新玉ねぎ <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">2個</span></li>
-          <li><span class="ingr-name">だし汁（または水＋顆粒だし）</span><span class="ingr-amount">400ml</span></li>
-          <li><span class="ingr-name">しょうゆ</span><span class="ingr-amount">大さじ3</span></li>
-          <li><span class="ingr-name">みりん</span><span class="ingr-amount">大さじ3</span></li>
-          <li><span class="ingr-name">砂糖</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">サラダ油</span><span class="ingr-amount">大さじ1</span></li>
-        </ul>
-        <h4>📋 手順</h4>
-        <ol class="steps-list">
-          <li><span class="step-num">1</span><span>新じゃがは皮ごとよく洗い、大きいものは半分に切る（5分）</span></li>
-          <li><span class="step-num">2</span><span>にんじんは乱切り、新玉ねぎはくし切りにする（3分）</span></li>
-          <li><span class="step-num">3</span><span>豚肉を一口大（3cm程度）に切る（2分）</span></li>
-          <li><span class="step-num">4</span><span>鍋にサラダ油を熱し、豚肉を色が変わるまで炒める（3分）</span></li>
-          <li><span class="step-num">5</span><span>野菜を全て加えてさっと炒め、だし汁・しょうゆ・みりん・砂糖を加える（2分）</span></li>
-          <li><span class="step-num">6</span><span>沸騰したらアクを取り、落し蓋をして中火で15分煮る（15分）</span></li>
-        </ol>
-        <div class="tip-box">新じゃがは皮が薄いので皮ごと調理OK！旨みが逃げず食感もホクホクです。</div>
-      </div>
-    </div>
-
-    <!-- 水曜 -->
-    <div class="recipe-card">
-      <div class="recipe-card-header" style="background:#fffdf0;">
-        <div class="day-circle wed" style="width:32px;height:32px;font-size:.8rem;">水</div>
-        <div>
-          <h3>ウインナー焼きそば</h3>
-          <div class="date-label">6/10（水） ・ 約20分</div>
-        </div>
-      </div>
-      <div class="recipe-section">
-        <h4>🥩 材料（4人分）</h4>
-        <ul class="ingredients-list">
-          <li><span class="ingr-name">焼きそば麺 <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">3袋</span></li>
-          <li><span class="ingr-name">あらびきウインナー <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1袋（約6本）</span></li>
-          <li><span class="ingr-name">キャベツ（火曜の残り）</span><span class="ingr-amount">1/4玉</span></li>
-          <li><span class="ingr-name">新玉ねぎ（火曜の残り）</span><span class="ingr-amount">1個</span></li>
-          <li><span class="ingr-name">かつおぶしめじ <span class="ingr-sale">99円均一</span></span><span class="ingr-amount">1袋</span></li>
-          <li><span class="ingr-name">ウスターソース</span><span class="ingr-amount">大さじ4</span></li>
-          <li><span class="ingr-name">しょうゆ</span><span class="ingr-amount">小さじ1</span></li>
-          <li><span class="ingr-name">青のり・かつお節</span><span class="ingr-amount">各適量</span></li>
-        </ul>
-        <h4>📋 手順</h4>
-        <ol class="steps-list">
-          <li><span class="step-num">1</span><span>キャベツをざく切り、玉ねぎを薄切り、ウインナーを斜め切りにする（5分）</span></li>
-          <li><span class="step-num">2</span><span>かつおぶしめじをさっと茹でてしょうゆで和え、おひたしを作る（5分）</span></li>
-          <li><span class="step-num">3</span><span>フライパンに油を熱し、ウインナー・野菜を炒める（5分）</span></li>
-          <li><span class="step-num">4</span><span>焼きそば麺を加えて水大さじ2を加えながらほぐし、ソース・しょうゆで味付けする（5分）</span></li>
-          <li><span class="step-num">5</span><span>皿に盛り付け、青のり・かつお節をかける</span></li>
-        </ol>
-        <div class="tip-box">麺をほぐす前に少し水を加えると焦げずにほぐれやすくなります！</div>
-      </div>
-    </div>
-
-    <!-- 木曜 -->
-    <div class="recipe-card">
-      <div class="recipe-card-header" style="background:#f0f9f4;">
-        <div class="day-circle thu" style="width:32px;height:32px;font-size:.8rem;">木</div>
-        <div>
-          <h3>ぶりの照り焼き</h3>
-          <div class="date-label">6/11（木） ・ 約25分</div>
-        </div>
-      </div>
-      <div class="recipe-section">
-        <h4>🥩 材料（4人分）</h4>
-        <ul class="ingredients-list">
-          <li><span class="ingr-name">ぶり切り身 <span class="ingr-sale">特売598円</span></span><span class="ingr-amount">4切れ</span></li>
-          <li><span class="ingr-name">新玉ねぎ（火曜の残り）</span><span class="ingr-amount">1個</span></li>
-          <li><span class="ingr-name">豆腐（味噌汁用）</span><span class="ingr-amount">1/2丁</span></li>
-          <li><span class="ingr-name">しょうゆ</span><span class="ingr-amount">大さじ2</span></li>
-          <li><span class="ingr-name">みりん</span><span class="ingr-amount">大さじ2</span></li>
-          <li><span class="ingr-name">酒</span><span class="ingr-amount">大さじ2</span></li>
-          <li><span class="ingr-name">砂糖</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">サラダ油</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">ポン酢（サラダ用）</span><span class="ingr-amount">大さじ2</span></li>
-        </ul>
-        <h4>📋 手順</h4>
-        <ol class="steps-list">
-          <li><span class="step-num">1</span><span>ぶりに塩少々を振って10分置き、水気をキッチンペーパーでふき取る（12分）</span></li>
-          <li><span class="step-num">2</span><span>しょうゆ・みりん・酒・砂糖を混ぜてたれを作っておく（2分）</span></li>
-          <li><span class="step-num">3</span><span>新玉ねぎを薄くスライスして水にさらし、水気を切ってポン酢で和える（5分）</span></li>
-          <li><span class="step-num">4</span><span>フライパンに油を熱し、ぶりを皮側から中火で3分、裏返して2分焼く（5分）</span></li>
-          <li><span class="step-num">5</span><span>余分な油をふき、たれを加えて照りが出るまで絡める（3分）</span></li>
-        </ol>
-        <div class="tip-box">ぶりは塩を振って水分を出すことで臭みが取れ、たれがよく絡みます！</div>
-      </div>
-    </div>
-
-    <!-- 金曜 -->
-    <div class="recipe-card">
-      <div class="recipe-card-header" style="background:#f0f4ff;">
-        <div class="day-circle fri" style="width:32px;height:32px;font-size:.8rem;">金</div>
-        <div>
-          <h3>豚ロースの生姜焼き</h3>
-          <div class="date-label">6/12（金） ・ 約20分</div>
-        </div>
-      </div>
-      <div class="recipe-section">
-        <h4>🥩 材料（4人分）</h4>
-        <ul class="ingredients-list">
-          <li><span class="ingr-name">豚ロース薄切り <span class="ingr-sale">3割引</span></span><span class="ingr-amount">350g</span></li>
-          <li><span class="ingr-name">にんじん（火曜の残り）</span><span class="ingr-amount">1/2本</span></li>
-          <li><span class="ingr-name">キャベツ（月曜の残り）</span><span class="ingr-amount">1/4玉</span></li>
-          <li><span class="ingr-name">卵（にんじんしりしり用）</span><span class="ingr-amount">2個</span></li>
-          <li><span class="ingr-name">しょうが（チューブ可）</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">しょうゆ</span><span class="ingr-amount">大さじ3</span></li>
-          <li><span class="ingr-name">みりん</span><span class="ingr-amount">大さじ2</span></li>
-          <li><span class="ingr-name">酒</span><span class="ingr-amount">大さじ1</span></li>
-          <li><span class="ingr-name">ごま油</span><span class="ingr-amount">小さじ1</span></li>
-        </ul>
-        <h4>📋 手順</h4>
-        <ol class="steps-list">
-          <li><span class="step-num">1</span><span>にんじんを細切りにし、ごま油で炒め、溶き卵を加えて炒め合わせ、しょうゆで味付けして「しりしり」を作る（7分）</span></li>
-          <li><span class="step-num">2</span><span>キャベツを千切りにして水にさらす（3分）</span></li>
-          <li><span class="step-num">3</span><span>しょうゆ・みりん・酒・しょうがを混ぜ、豚肉に揉み込む（5分）</span></li>
-          <li><span class="step-num">4</span><span>フライパンを熱し、豚肉を広げながら両面焼く（5分）</span></li>
-          <li><span class="step-num">5</span><span>器に盛り付け、千切りキャベツ・にんじんしりしりを添える</span></li>
-        </ol>
-        <div class="tip-box">にんじんしりしりは沖縄料理！彩りもよく子どもも喜ぶ副菜です。にんじんの甘みが際立ちます。</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ==================== 買い物リスト ==================== -->
-<div id="tab-shopping" class="tab-content">
-
-  <div class="notice-box">
-    ⚡ <strong>6/9（火）はやさいの日＋お肉の日！</strong> 1回目の買い物はこの日がお得です。ぶりも当日購入して冷蔵保存しておくと◎
-  </div>
-
-  <!-- 1回目 -->
-  <div class="shopping-section">
-    <h3>🛒 1回目の買い物（6/9 火曜推奨）　月・火・水曜分 ＋ 木曜のぶり</h3>
-    <div class="shop-category">
-      <div class="shop-cat-label">🔴 月曜日の食材</div>
-
-      <label><input type="checkbox" class="shop-check shop-mon"><span class="shop-item-name">ロースとんかつ</span><span class="shop-item-amount">1パック（4枚）</span><span class="shop-item-price sale">99円</span></label>
-      <label><input type="checkbox" class="shop-check shop-mon"><span class="shop-item-name">チンゲン菜</span><span class="shop-item-amount">1袋</span><span class="shop-item-price sale">99円</span></label>
-      <label><input type="checkbox" class="shop-check shop-mon"><span class="shop-item-name">めかぶ</span><span class="shop-item-amount">1袋（4パック入）</span><span class="shop-item-price sale">99円</span></label>
-
-      <div class="shop-cat-label">🟠 火曜日の食材</div>
-      <label><input type="checkbox" class="shop-check shop-tue"><span class="shop-item-name">豚もも肉</span><span class="shop-item-amount">300g（3割引）</span><span class="shop-item-price sale">約370円</span></label>
-      <label><input type="checkbox" class="shop-check shop-tue"><span class="shop-item-name">新じゃがいも</span><span class="shop-item-amount">400g（小8〜10個）</span><span class="shop-item-price sale">99円</span></label>
-      <label><input type="checkbox" class="shop-check shop-tue"><span class="shop-item-name">にんじん</span><span class="shop-item-amount">1本</span><span class="shop-item-price sale">99円</span></label>
-      <label><input type="checkbox" class="shop-check shop-tue"><span class="shop-item-name">新玉ねぎ</span><span class="shop-item-amount">3個</span><span class="shop-item-price sale">99×3＝297円</span></label>
-      <label><input type="checkbox" class="shop-check shop-tue"><span class="shop-item-name">キャベツ</span><span class="shop-item-amount">1玉</span><span class="shop-item-price sale">138円</span></label>
-
-      <div class="shop-cat-label">🟡 水曜日の食材</div>
-      <label><input type="checkbox" class="shop-check shop-wed"><span class="shop-item-name">焼きそば麺</span><span class="shop-item-amount">3袋</span><span class="shop-item-price sale">99×3＝297円</span></label>
-      <label><input type="checkbox" class="shop-check shop-wed"><span class="shop-item-name">あらびきウインナー</span><span class="shop-item-amount">1袋</span><span class="shop-item-price sale">99円</span></label>
-      <label><input type="checkbox" class="shop-check shop-wed"><span class="shop-item-name">かつおぶしめじ</span><span class="shop-item-amount">1袋</span><span class="shop-item-price sale">99円</span></label>
-
-      <div class="shop-cat-label">🟢 木曜日の食材（まとめ購入）</div>
-      <label><input type="checkbox" class="shop-check shop-thu"><span class="shop-item-name">ぶり切り身</span><span class="shop-item-amount">4切れ</span><span class="shop-item-price">598円</span></label>
-
-      <div class="shop-cat-label">⚪ 共通食材・日配品</div>
-      <label><input type="checkbox" class="shop-check shop-common"><span class="shop-item-name">豆腐（絹 or 木綿）</span><span class="shop-item-amount">1〜2丁（味噌汁用）</span><span class="shop-item-price sale">99円〜</span></label>
-      <label><input type="checkbox" class="shop-check shop-common"><span class="shop-item-name">卵</span><span class="shop-item-amount">6個〜（しりしり用）</span><span class="shop-item-price">（常備品）</span></label>
-      <label><input type="checkbox" class="shop-check shop-common"><span class="shop-item-name">米（自宅在庫確認）</span><span class="shop-item-amount">4〜5合分</span><span class="shop-item-price">（常備品）</span></label>
-    </div>
-  </div>
-
-  <!-- 2回目 -->
-  <div class="shopping-section">
-    <h3 class="thu">🛒 2回目の買い物（6/11 木曜） 金曜日分</h3>
-    <div class="shop-category">
-      <div class="shop-cat-label">🔵 金曜日の食材</div>
-      <label><input type="checkbox" class="shop-check shop-fri"><span class="shop-item-name">豚ロース薄切り</span><span class="shop-item-amount">350g（3割引）</span><span class="shop-item-price sale">約490円</span></label>
-    </div>
-  </div>
-
-  <!-- Share buttons -->
-  <div class="section-title">📤 買い物リストを共有</div>
   <div class="share-buttons">
     <button class="share-btn btn-copy" onclick="copyList()">📋 コピー</button>
-    <button class="share-btn btn-line" onclick="shareToLine()">💬 LINEで送る</button>
-    <button class="share-btn btn-qr" onclick="showQR()">📷 QRコード</button>
+    <button class="share-btn btn-line" onclick="shareToLine()">💬 LINE共有</button>
+    <button class="share-btn btn-qr" onclick="toggleQR()">📱 QRコード</button>
   </div>
-</div>
+  <div class="copy-success" id="copy-success">✅ クリップボードにコピーしました！</div>
 
-<!-- ==================== 予算 ==================== -->
-<div id="tab-budget" class="tab-content">
+  <div id="qr-container">
+    <div id="qrcode"></div>
+    <p>スマホのカメラで読み込むと買い物リストが表示されます</p>
+  </div>
+
+  <!-- 月曜分：お肉の市 -->
+  <div class="shopping-section">
+    <div class="shopping-header" style="background: linear-gradient(135deg, #e8734a, #d4550c)">
+      🛒 <span>第1回：月曜日 6/15（お肉の市）</span><span style="margin-left:auto;font-size:0.8rem">月〜火曜の食材</span>
+    </div>
+    <div class="shopping-body">
+      <div class="shop-category">🥩 肉類【月曜限り特売】</div>
+      <div class="shop-item">
+        <input type="checkbox" id="i1"><label for="i1">豚うす切り肉（350g）<span class="note"> — しょうが焼き用 🏷️ 3割引対象</span></label>
+        <span class="price">約200円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i2"><label for="i2">鶏もも肉（350g）<span class="note"> — 炒め物用 🏷️ 特売118円/100g</span></label>
+        <span class="price">約413円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i3"><label for="i3">合いびき肉（400g）<span class="note"> — ハンバーグ用（木曜まで冷凍） 🏷️ 挽肉2割引対象</span></label>
+        <span class="price">約320円</span>
+      </div>
+
+      <div class="shop-category">🥦 野菜・その他（通常価格）</div>
+      <div class="shop-item">
+        <input type="checkbox" id="i4"><label for="i4">新玉ねぎ（2個）</label>
+        <span class="price">約150円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i5"><label for="i5">豆腐（1丁）<span class="note"> — 汁物・白和え用</span></label>
+        <span class="price">約100円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i6"><label for="i6">卵（1パック）<span class="note"> — ハンバーグ用</span></label>
+        <span class="price">約200円</span>
+      </div>
+      <div class="total-row">
+        <span>第1回 小計</span>
+        <span class="amount">約1,383円</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 火曜分：お野菜の市 -->
+  <div class="shopping-section">
+    <div class="shopping-header" style="background: linear-gradient(135deg, #27ae60, #1e8449)">
+      🛒 <span>第2回：火曜日 6/16（お野菜の市）</span><span style="margin-left:auto;font-size:0.8rem">火〜金曜の野菜</span>
+    </div>
+    <div class="shopping-body" style="border-color: #d5e8d4">
+      <div class="shop-category" style="background:#f0faf0;color:#27ae60">🌽 野菜【火曜限り特売】</div>
+      <div class="shop-item">
+        <input type="checkbox" id="i7"><label for="i7">とうもろこし（2本）<span class="note"> — 炒め物用 🏷️ 128円/本</span></label>
+        <span class="price">256円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i8"><label for="i8">きゅうり（3本）<span class="note"> — サラダ・冷やし汁用 🏷️ 48円/本</span></label>
+        <span class="price">144円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i9"><label for="i9">新じゃが芋（1袋）<span class="note"> — 味噌汁用 🏷️ 48円/袋</span></label>
+        <span class="price">48円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i10"><label for="i10">長なす（3〜4本）<span class="note"> — 揚げびたし・ホイル焼き用 🏷️ 68円/本</span></label>
+        <span class="price">204円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i11"><label for="i11">にら（1袋）<span class="note"> — 味噌汁用 🏷️ 68円</span></label>
+        <span class="price">68円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i12"><label for="i12">ほうれん草（1袋）<span class="note"> — ごま和え・白和え用 🏷️ 138円</span></label>
+        <span class="price">138円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i13"><label for="i13">にんじん（1本）<span class="note"> — 南蛮漬け用</span></label>
+        <span class="price">約50円</span>
+      </div>
+      <div class="total-row" style="background:#e8f5e9;border-color:#27ae60">
+        <span>第2回 小計</span>
+        <span class="amount" style="color:#27ae60">約908円</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 水曜分：お魚の市 -->
+  <div class="shopping-section">
+    <div class="shopping-header" style="background: linear-gradient(135deg, #2980b9, #1a5f8a)">
+      🛒 <span>第3回：水曜日 6/17（お魚の市）</span><span style="margin-left:auto;font-size:0.8rem">水〜金曜の魚 ＋ 残り食材</span>
+    </div>
+    <div class="shopping-body" style="border-color: #b8d0e8">
+      <div class="shop-category" style="background: #f0f7ff; color: #2980b9">🐟 魚介類【水曜限り特売】</div>
+      <div class="shop-item">
+        <input type="checkbox" id="i14"><label for="i14">生真あじ（2尾）<span class="note"> — 南蛮漬け用 🏷️ 157円/尾</span></label>
+        <span class="price">314円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i15"><label for="i15">味もずく（3パック）<span class="note"> — 汁物用 🏷️ 127円/パック</span></label>
+        <span class="price">381円</span>
+      </div>
+      <div class="shop-item">
+        <input type="checkbox" id="i16"><label for="i16">冷凍塩鮭切り身（4切れ入り）<span class="note"> — ホイル焼き用（金曜まで冷凍） 🏷️ 500円</span></label>
+        <span class="price">500円</span>
+      </div>
+
+      <div class="shop-category" style="background: #f0f7ff; color: #2980b9">🥦 野菜（通常価格）</div>
+      <div class="shop-item">
+        <input type="checkbox" id="i17"><label for="i17">大根（1/4本）<span class="note"> — ハンバーグおろしソース用</span></label>
+        <span class="price">約80円</span>
+      </div>
+
+      <div class="total-row" style="background: #e8f3ff; border-color: #2980b9">
+        <span>第3回 小計</span>
+        <span class="amount" style="color: #2980b9">約1,275円</span>
+      </div>
+    </div>
+  </div>
 
   <div class="budget-total">
-    <h3>今週の食材費（推定）</h3>
-    <div class="amount">約 3,750円</div>
-    <p>残り 約 1,250円 ／ 調味料・米・消耗品に充当可</p>
-    <div class="budget-bar-wrap">
-      <div class="budget-bar" style="width:75%;"></div>
-    </div>
-    <p style="margin-top:6px;font-size:.72rem;">▲ 5,000円予算のうち 75% 使用</p>
+    <span>🏦 買い物合計（食材費）</span>
+    <span>約3,566円</span>
+  </div>
+  <div style="font-size:0.75rem; color:#888; text-align:right; margin-top:4px">
+    ※調味料・油・米代を除く食材のみの概算
   </div>
 
-  <div class="section-title">📊 内訳</div>
+</div><!-- /tab-shopping -->
 
-  <div class="budget-table">
-    <div class="budget-row">
-      <span class="item-label">月曜 ─ ロースとんかつ定食</span>
-      <span class="item-price">約 650円</span>
-    </div>
-    <div class="budget-row" style="padding-left:28px; font-size:.78rem; color:var(--text-sub); border-bottom:1px solid var(--gray);">
-      <span>└ とんかつ 99 ／ チンゲン菜 99 ／ めかぶ 99 ／ 他</span>
-    </div>
+<!-- ===== 予算・栄養 ===== -->
+<div id="tab-budget" class="content">
 
-    <div class="budget-row">
-      <span class="item-label">火曜 ─ 豚と新じゃがの煮物</span>
-      <span class="item-price">約 870円</span>
-    </div>
-    <div class="budget-row" style="padding-left:28px; font-size:.78rem; color:var(--text-sub); border-bottom:1px solid var(--gray);">
-      <span>└ 豚もも(3割引) 370 ／ 新じゃが 99 ／ にんじん 99 ／ 新玉 198 ／ キャベツ 138</span>
-    </div>
-
-    <div class="budget-row">
-      <span class="item-label">水曜 ─ ウインナー焼きそば</span>
-      <span class="item-price">約 550円</span>
-    </div>
-    <div class="budget-row" style="padding-left:28px; font-size:.78rem; color:var(--text-sub); border-bottom:1px solid var(--gray);">
-      <span>└ 焼きそば 297 ／ ウインナー 99 ／ かつおぶしめじ 99 ／ 野菜(共通)</span>
-    </div>
-
-    <div class="budget-row">
-      <span class="item-label">木曜 ─ ぶりの照り焼き</span>
-      <span class="item-price">約 700円</span>
-    </div>
-    <div class="budget-row" style="padding-left:28px; font-size:.78rem; color:var(--text-sub); border-bottom:1px solid var(--gray);">
-      <span>└ ぶり 598 ／ 豆腐 99 ／ 新玉(共通)</span>
-    </div>
-
-    <div class="budget-row">
-      <span class="item-label">金曜 ─ 豚ロースの生姜焼き</span>
-      <span class="item-price">約 590円</span>
-    </div>
-    <div class="budget-row" style="padding-left:28px; font-size:.78rem; color:var(--text-sub); border-bottom:1px solid var(--gray);">
-      <span>└ 豚ロース(3割引) 490 ／ にんじん・キャベツ(共通) ／ 卵(常備)</span>
-    </div>
-
-    <div class="budget-row subtotal">
-      <span class="item-label">食材合計</span>
-      <span class="item-price">約 3,360円</span>
-    </div>
-    <div class="budget-row">
-      <span class="item-label">調味料・だし・常備品補充</span>
-      <span class="item-price">約 390円</span>
-    </div>
-    <div class="budget-row total">
-      <span class="item-label">🏷 週合計</span>
-      <span class="item-price">約 3,750円</span>
+  <div class="week-summary">
+    <h3>📊 今週のまとめ</h3>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="s-label">食材費合計</div>
+        <div class="s-value">約3,714円</div>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">予算残り</div>
+        <div class="s-value">約1,286円</div>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">調理時間（平均）</div>
+        <div class="s-value">約25分</div>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">旬食材使用数</div>
+        <div class="s-value">8種類</div>
+      </div>
     </div>
   </div>
 
-  <div class="budget-advice">
-    <h4>💡 節約のポイント</h4>
-    ・<strong>6/9のお肉の日（3割引）</strong>を活用し、豚もも・豚ロースをまとめて購入すると〜200円節約。<br>
-    ・キャベツ・玉ねぎ・にんじんを複数日で使い切ることで食材ロスゼロを実現。<br>
-    ・ぶりは6/9の鮮魚特売を狙えばさらにお得になる可能性あり。<br>
-    ・残予算（約1,250円）は米・みりん・しょうゆなど調味料の補充に充てられます。
+  <!-- 予算内訳 -->
+  <div class="budget-card">
+    <h3>💰 予算内訳</h3>
+    <div class="budget-row">
+      <span class="cat">肉類（豚・鶏・挽肉）</span>
+      <span class="amt">約933円</span>
+    </div>
+    <div class="budget-row">
+      <span class="cat">魚類（あじ・もずく・塩鮭）</span>
+      <span class="amt">約1,195円</span>
+    </div>
+    <div class="budget-row">
+      <span class="cat">野菜・きのこ類</span>
+      <span class="amt">約1,058円</span>
+    </div>
+    <div class="budget-row">
+      <span class="cat">豆腐・卵・日配品</span>
+      <span class="amt">約400円</span>
+    </div>
+    <div class="budget-row">
+      <span class="cat">調味料・その他</span>
+      <span class="amt">（家庭常備品）</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-fill" style="width: 74%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#888">
+      <span>0円</span><span>使用額 3,714円（74%）</span><span>予算 5,000円</span>
+    </div>
   </div>
 
-</div>
-
-<!-- ==================== QR Modal ==================== -->
-<div class="qr-modal" id="qrModal" onclick="closeQR(event)">
-  <div class="qr-box">
-    <h3>📷 買い物リストQRコード</h3>
-    <div id="qrcode"></div>
-    <p>スマホのカメラで読み取ると<br>買い物リストを開けます</p>
-    <button class="qr-close" onclick="closeModal()">閉じる</button>
+  <!-- 1日あたりのコスト -->
+  <div class="budget-card">
+    <h3>📅 日別コスト目安</h3>
+    <div class="budget-row"><span class="cat">月曜：豚のしょうが焼き</span><span class="amt">約600円</span></div>
+    <div class="budget-row"><span class="cat">火曜：鶏ももとトウモロコシ炒め</span><span class="amt">約850円</span></div>
+    <div class="budget-row"><span class="cat">水曜：真あじの南蛮漬け</span><span class="amt">約800円</span></div>
+    <div class="budget-row"><span class="cat">木曜：和風おろしハンバーグ</span><span class="amt">約750円</span></div>
+    <div class="budget-row"><span class="cat">金曜：塩鮭のホイル焼き</span><span class="amt">約714円</span></div>
   </div>
-</div>
 
-<!-- Copy Toast -->
-<div class="copy-toast" id="copyToast">📋 コピーしました！</div>
+  <!-- 旬食材 -->
+  <div class="budget-card">
+    <h3>🌿 今週使う旬の食材（6月 初夏）</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+      <span style="background:#e8f5e9;color:#27ae60;border:1px solid #a5d6a7;border-radius:20px;padding:4px 12px;font-size:0.78rem">🌽 とうもろこし</span>
+      <span style="background:#e8f5e9;color:#27ae60;border:1px solid #a5d6a7;border-radius:20px;padding:4px 12px;font-size:0.78rem">🥒 きゅうり</span>
+      <span style="background:#e8f5e9;color:#27ae60;border:1px solid #a5d6a7;border-radius:20px;padding:4px 12px;font-size:0.78rem">🍆 長なす</span>
+      <span style="background:#e8f5e9;color:#27ae60;border:1px solid #a5d6a7;border-radius:20px;padding:4px 12px;font-size:0.78rem">🧅 新玉ねぎ</span>
+      <span style="background:#e8f5e9;color:#27ae60;border:1px solid #a5d6a7;border-radius:20px;padding:4px 12px;font-size:0.78rem">🥔 新じゃがいも</span>
+      <span style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;border-radius:20px;padding:4px 12px;font-size:0.78rem">🐟 真あじ（旬）</span>
+      <span style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;border-radius:20px;padding:4px 12px;font-size:0.78rem">🌊 もずく</span>
+      <span style="background:#fce4ec;color:#c62828;border:1px solid #ef9a9a;border-radius:20px;padding:4px 12px;font-size:0.78rem">🌿 にら</span>
+    </div>
+  </div>
+
+  <!-- 食材使いきり表 -->
+  <div class="ingredient-map">
+    <h3>♻️ 食材使いきりマップ</h3>
+    <div class="ing-item">
+      <span class="ing-name">新玉ねぎ</span>
+      <div class="ing-days">
+        <span class="ing-day-tag">月：サラダ</span>
+        <span class="ing-day-tag day3">水：南蛮漬け</span>
+        <span class="ing-day-tag day5">金：冷やし汁</span>
+      </div>
+    </div>
+    <div class="ing-item">
+      <span class="ing-name">新じゃがいも</span>
+      <div class="ing-days">
+        <span class="ing-day-tag">月：味噌汁</span>
+        <span class="ing-day-tag day4">木：豆腐汁</span>
+      </div>
+    </div>
+    <div class="ing-item">
+      <span class="ing-name">長なす</span>
+      <div class="ing-days">
+        <span class="ing-day-tag day2">火：揚げびたし</span>
+        <span class="ing-day-tag day5">金：ホイル焼き</span>
+      </div>
+    </div>
+    <div class="ing-item">
+      <span class="ing-name">きゅうり</span>
+      <div class="ing-days">
+        <span class="ing-day-tag">月：サラダ</span>
+        <span class="ing-day-tag day3">水：副菜</span>
+        <span class="ing-day-tag day5">金：冷やし汁</span>
+      </div>
+    </div>
+    <div class="ing-item">
+      <span class="ing-name">ほうれん草</span>
+      <div class="ing-days">
+        <span class="ing-day-tag day3">水：ごま和え</span>
+        <span class="ing-day-tag day5">金：白和え</span>
+      </div>
+    </div>
+    <div class="ing-item">
+      <span class="ing-name">豆腐</span>
+      <div class="ing-days">
+        <span class="ing-day-tag day2">火：味噌汁</span>
+        <span class="ing-day-tag day4">木：豆腐汁</span>
+        <span class="ing-day-tag day5">金：白和え</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 栄養バランス -->
+  <div class="budget-card">
+    <h3>🥗 栄養バランスのポイント</h3>
+    <div style="font-size:0.82rem;line-height:1.8;color:#555">
+      ✅ <strong>タンパク質</strong>：豚・鶏・あじ・ひき肉・豆腐と毎日確保<br>
+      ✅ <strong>ビタミン</strong>：旬のとうもろこし・なす・ほうれん草が豊富<br>
+      ✅ <strong>カルシウム</strong>：小魚（あじ）・豆腐・わかめで補給<br>
+      ✅ <strong>食物繊維</strong>：もずく・新玉ねぎ・きゅうり・にらで腸活<br>
+      ✅ <strong>鉄分</strong>：ほうれん草・ひき肉で子どもの成長をサポート
+    </div>
+  </div>
+
+</div><!-- /tab-budget -->
 
 <script>
-// ===== Tab switching =====
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  if (btn) btn.classList.add('active');
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
 }
 
-// ===== Shopping list text =====
+function toggleRecipe(id) {
+  const panel = document.getElementById(id);
+  const btn = panel.previousElementSibling.querySelector('.detail-btn');
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    btn.textContent = '▼ レシピを見る';
+  } else {
+    panel.classList.add('open');
+    btn.textContent = '▲ レシピを閉じる';
+  }
+}
+
 function getShoppingText() {
-  return `【週間献立 買い物リスト 6/8〜6/12】
-4人家族 / 予算5,000円
+  return `【買い物リスト】6/15週 夕食献立用
+※ヨークベニマルは日替り特売のため3回に分けて購入！
 
-■ 1回目（6/9 火曜推奨）
-▼月曜分
-・ロースとんかつ 1パック ……… 99円
-・チンゲン菜 1袋 ……… 99円
-・めかぶ 1袋 ……… 99円
+■ 第1回：月曜日 6/15（お肉の市）
+【肉類】🏷️月曜限り特売
+□ 豚うす切り肉 350g（3割引対象）約200円
+□ 鶏もも肉 350g（118円/100g特売）約413円
+□ 合いびき肉 400g（挽肉2割引対象・冷凍保存）約320円
 
-▼火曜分
-・豚もも肉 300g（3割引） ……… 約370円
-・新じゃがいも 400g ……… 99円
-・にんじん 1本 ……… 99円
-・新玉ねぎ 3個 ……… 297円
-・キャベツ 1玉 ……… 138円
+【その他 通常価格】
+□ 新玉ねぎ 2個 約150円
+□ 豆腐 1丁 約100円
+□ 卵 1パック 約200円
 
-▼水曜分
-・焼きそば麺 3袋 ……… 297円
-・あらびきウインナー 1袋 ……… 99円
-・かつおぶしめじ 1袋 ……… 99円
+第1回 小計：約1,383円
 
-▼木曜分（まとめ購入）
-・ぶり切り身 4切れ ……… 598円
+■ 第2回：火曜日 6/16（お野菜の市）
+【野菜類】🏷️火曜限り特売
+□ とうもろこし 2本（128円/本）256円
+□ きゅうり 3本（48円/本）144円
+□ 新じゃが芋 1袋（48円）48円
+□ 長なす 3〜4本（68円/本）204円
+□ にら 1袋（68円）68円
+□ ほうれん草 1袋（138円）138円
+□ にんじん 1本 約50円
 
-▼共通
-・豆腐 1〜2丁 ……… 99円〜
+第2回 小計：約908円
 
-■ 2回目（6/11 木曜）
-・豚ロース薄切り 350g（3割引） ……… 約490円
+■ 第3回：水曜日 6/17（お魚の市）
+【魚介類】🏷️水曜限り特売
+□ 生真あじ 2尾（157円/尾）314円
+□ 味もずく 3パック（127円/パック）381円
+□ 冷凍塩鮭切り身 4切れ入り（特売500円）500円
 
----
-推定合計: 約3,750円
-(みやぎ生協チラシ活用)`;
+【その他 通常価格】
+□ 大根 1/4本 約80円
+
+第3回 小計：約1,275円
+
+合計：約3,566円（予算5,000円中）`;
 }
 
-// ===== Copy =====
 function copyList() {
   const text = getShoppingText();
   navigator.clipboard.writeText(text).then(() => {
-    const toast = document.getElementById('copyToast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    const toast = document.getElementById('copyToast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    const el = document.getElementById('copy-success');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
   });
 }
 
-// ===== LINE sharing =====
 function shareToLine() {
-  const text = getShoppingText();
-  const encoded = encodeURIComponent(text);
-  window.open('https://line.me/R/share?text=' + encoded, '_blank');
+  const text = encodeURIComponent(getShoppingText());
+  window.open('https://line.me/R/msg/text/?' + text, '_blank');
 }
 
-// ===== QR Code =====
 let qrGenerated = false;
-function showQR() {
-  document.getElementById('qrModal').classList.add('open');
-  if (!qrGenerated) {
+function toggleQR() {
+  const container = document.getElementById('qr-container');
+  container.classList.toggle('show');
+  if (!qrGenerated && container.classList.contains('show')) {
     const text = getShoppingText();
-    // QRコードはテキストが長いためURLエンコードして生成
+    // テキストが長すぎるためURLエンコードしてshort textにする
+    const shortText = `【買い物リスト 6/15週】\n第1回(月)：豚うす切り・鶏もも・真あじ2尾・もずく3P・とうもろこし2本・きゅうり3本・新じゃが・新玉ねぎ・なす・にら・ほうれん草・にんじん・豆腐\n第2回(木)：合いびき肉・冷凍塩鮭4切・卵・豆腐・新じゃが・大根`;
     new QRCode(document.getElementById("qrcode"), {
-      text: text.substring(0, 500), // QRコードのサイズ制限に合わせて短縮
+      text: shortText,
       width: 200,
       height: 200,
-      colorDark: "#2d7a4f",
+      colorDark: "#333",
       colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.M
     });
     qrGenerated = true;
   }
 }
-
-function closeQR(e) {
-  if (e.target === document.getElementById('qrModal')) closeModal();
-}
-function closeModal() {
-  document.getElementById('qrModal').classList.remove('open');
-}
-
-// Animate budget bar
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const bar = document.querySelector('.budget-bar');
-    if (bar) bar.style.width = '75%';
-  }, 300);
-});
 </script>
 </body>
 </html>
